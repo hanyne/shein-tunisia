@@ -45,7 +45,8 @@ export async function POST(request: NextRequest) {
     }
 
     // Get admin
-    const admin = db.admins.getAll().find(a => a.id === session.adminId)
+    const admins = await db.admins.getAll()
+    const admin = admins.find(a => a.id === session.adminId)
     if (!admin) {
       return NextResponse.json({ error: 'Admin non trouvé' }, { status: 404 })
     }
@@ -59,17 +60,11 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Update password
-    const admins = db.admins.getAll()
-    const adminIndex = admins.findIndex(a => a.id === admin.id)
-    if (adminIndex !== -1) {
-      admins[adminIndex].password = newPassword
-      logger.info('Password changed successfully', { adminId: admin.id })
-      
-      return NextResponse.json({ message: 'Mot de passe modifié avec succès' })
-    }
-
-    return NextResponse.json({ error: 'Erreur lors de la modification' }, { status: 500 })
+    // Update password using MongoDB
+    await db.admins.updatePassword(admin.email, newPassword)
+    logger.info('Password changed successfully', { adminId: admin.id })
+    
+    return NextResponse.json({ message: 'Mot de passe modifié avec succès' })
   } catch (error) {
     logger.error('Error changing password', error)
     return NextResponse.json(

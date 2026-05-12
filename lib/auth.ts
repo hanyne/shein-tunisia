@@ -17,8 +17,8 @@ if (!(global as any).sessions) {
 const sessions = (global as any).sessions as Map<string, Session>
 
 export const auth = {
-  login: (email: string, password: string): string | null => {
-    const admin = db.admins.getByEmail(email)
+  login: async (email: string, password: string): Promise<string | null> => {
+    const admin = await db.admins.getByEmail(email)
     
     if (!admin || admin.password !== password) {
       return null

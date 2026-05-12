@@ -14,7 +14,7 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    const sessionId = auth.login(email, password)
+    const sessionId = await auth.login(email, password)
 
     if (!sessionId) {
       console.log('❌ Login failed for:', email)
