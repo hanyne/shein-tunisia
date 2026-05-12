@@ -20,7 +20,7 @@ interface Product {
   rating?: number
   reviews?: number
   createdAt: string
-  image?: string
+  image: string  // Required for ProductCard
 }
 
 export default function ShopPage() {
@@ -70,7 +70,7 @@ export default function ShopPage() {
       const data = await response.json()
       setProducts(data.map((p: any) => ({
         ...p,
-        image: p.images[0],
+        image: p.images && p.images.length > 0 ? p.images[0] : '/placeholder.png',
       })))
     } catch (error) {
       console.error('Error loading products:', error)
