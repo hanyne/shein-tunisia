@@ -1,283 +1,290 @@
-# She in - Premium Fashion E-commerce Platform
+# 🛍️ She in - Boutique en Ligne de Mode
 
-![She in](https://img.shields.io/badge/She%20in-Fashion%20Boutique-ff69b4)
-![Next.js](https://img.shields.io/badge/Next.js-14-black)
-![TypeScript](https://img.shields.io/badge/TypeScript-5.0-blue)
-![Tailwind CSS](https://img.shields.io/badge/Tailwind-3.3-38bdf8)
-
-**She in** is Tunisia's first online boutique specialized in importing trendy fashion products from platforms like SHEIN, Zalando, and other international fashion boutiques. Built with modern web technologies, it offers a premium, elegant, and feminine shopping experience.
-
-## ✨ Features
-
-### 🏠 Home Page
-- Beautiful hero banner with trendy fashion collections
-- Promotional sections highlighting key features
-- "New Arrivals" and "Best Sellers" sections
-- Customer testimonials
-- Product categories (dresses, bags, shoes, makeup, accessories, sets)
-- Instagram-style visuals and smooth animations
-- Newsletter subscription
-
-### 🛍️ Shop / Products Page
-- Product grid with elegant cards
-- Advanced filters (category, size, color, price)
-- Search functionality
-- Wishlist integration
-- Quick add-to-cart feature
-- Sorting options (featured, price, newest)
-- Responsive design
-
-### 📦 Product Detail Page
-- Large product image gallery
-- Detailed product description
-- Size and color selection
-- Quantity selector
-- Add to cart functionality
-- Delivery information (24-48h delivery across Tunisia)
-- Customer reviews and ratings
-- Related products suggestions
-
-### 🛒 Shopping Cart & Checkout
-- Smooth cart experience with quantity management
-- Order summary with pricing breakdown
-- Delivery information form
-- Cash on Delivery (COD) payment option
-- Secure order confirmation
-- Order tracking system
-
-### 📄 Additional Pages
-- **About Us**: Company story and values
-- **Contact**: Contact form and information
-- **FAQ**: Frequently asked questions
-- **Order Tracking**: Real-time order status
-- **Wishlist**: Save favorite products
-- **Account**: User profile and order history
-
-## 🔐 Admin Dashboard
-
-### Access Admin Panel
-
-**URL:** `http://localhost:3000/admin/login`
-
-**Default Credentials:**
-- Email: `admin@shein.tn`
-- Password: `admin123`
-
-⚠️ **Important:** Change these credentials in production!
-
-### Admin Features
-
-#### 📊 Dashboard
-- Real-time statistics (products, orders, revenue, customers)
-- Quick access to management sections
-- Admin profile and logout
-
-#### 🛍️ Product Management
-- **View All Products:** See all products in a table format
-- **Add New Product:** Complete form with all product details
-  - Name, price, description
-  - Multiple images (comma-separated URLs)
-  - Sizes and colors
-  - Category selection
-  - Stock status
-  - New/Best-seller badges
-- **Edit Product:** Modify existing product information
-- **Delete Product:** Remove products from the catalog
-
-#### 🔄 Dynamic Product Display
-- Products added via admin automatically appear on:
-  - Home page (New Arrivals & Best Sellers sections)
-  - Shop page (with filters)
-  - Product detail pages
-- Real-time updates across the entire site
-
-### API Endpoints
-
-```
-GET    /api/products          - Get all products
-POST   /api/products          - Create product (admin only)
-GET    /api/products/[id]     - Get single product
-PUT    /api/products/[id]     - Update product (admin only)
-DELETE /api/products/[id]     - Delete product (admin only)
-
-POST   /api/auth/login        - Admin login
-POST   /api/auth/logout       - Admin logout
-GET    /api/auth/session      - Check session
-```
-
-### Security Features
-
-- Session-based authentication
-- Protected admin routes
-- HttpOnly cookies
-- 24-hour session expiration
-- Authorization checks on all admin endpoints
-
-📖 **For detailed admin instructions, see [ADMIN_GUIDE.md](./ADMIN_GUIDE.md)**
+**Site e-commerce moderne pour l'importation de produits de mode en Tunisie**
 
 ---
 
-## 🎨 Design Features
+## 🎯 À Propos
 
-- **Color Palette**: Soft pink, white, nude, and gold tones
-- **Typography**: Elegant Playfair Display for headings, Inter for body text
-- **Animations**: Framer Motion for smooth transitions and interactions
-- **Responsive**: Fully responsive for mobile, tablet, and desktop
-- **Modern UI/UX**: Instagram-inspired, luxury fashion brand aesthetic
+She in est une boutique en ligne spécialisée dans l'importation de produits de mode tendance depuis les plus grandes plateformes internationales (SHEIN, Zalando, etc.) vers la Tunisie.
 
-## 🚀 Tech Stack
+**Caractéristiques:**
+- ✅ Design moderne et élégant
+- ✅ 100% responsive (mobile, tablette, desktop)
+- ✅ Interface en français
+- ✅ Filtres avancés fonctionnels
+- ✅ Panel admin complet
+- ✅ Sécurité implémentée
 
-- **Framework**: Next.js 14 (App Router)
-- **Language**: TypeScript
-- **Styling**: Tailwind CSS
-- **State Management**: Zustand
-- **Animations**: Framer Motion
-- **Icons**: React Icons
-- **Image Slider**: Swiper
+---
 
-## 📦 Installation
+## 🚀 Démarrage Rapide
 
-1. **Clone the repository**
+### **Installation**
+
 ```bash
-git clone <repository-url>
-cd she-in-boutique
-```
+# Cloner le projet
+git clone https://github.com/USERNAME/shein-tunisia.git
 
-2. **Install dependencies**
-```bash
+# Installer les dépendances
+cd shein-tunisia
 npm install
-```
 
-3. **Run the development server**
-```bash
+# Lancer le serveur de développement
 npm run dev
 ```
 
-4. **Open your browser**
-Navigate to [http://localhost:3000](http://localhost:3000)
+Le site sera accessible sur http://localhost:3000
 
-## 🏗️ Project Structure
+### **Build de Production**
 
+```bash
+npm run build
+npm start
 ```
-she-in-boutique/
-├── app/
-│   ├── about/              # About page
-│   ├── account/            # User account
-│   ├── cart/               # Shopping cart
-│   ├── checkout/           # Checkout process
-│   ├── contact/            # Contact page
-│   ├── faq/                # FAQ page
-│   ├── order-confirmation/ # Order confirmation
-│   ├── product/[id]/       # Product detail page
-│   ├── shop/               # Shop/products listing
-│   ├── track-order/        # Order tracking
-│   ├── wishlist/           # Wishlist page
-│   ├── globals.css         # Global styles
-│   ├── layout.tsx          # Root layout
-│   └── page.tsx            # Home page
-├── components/
-│   ├── home/               # Home page components
-│   ├── layout/             # Layout components (Header, Footer)
-│   └── products/           # Product components
-├── store/
-│   ├── useCartStore.ts     # Cart state management
-│   └── useWishlistStore.ts # Wishlist state management
-├── public/                 # Static assets
-├── next.config.js          # Next.js configuration
-├── tailwind.config.js      # Tailwind CSS configuration
-├── tsconfig.json           # TypeScript configuration
-└── package.json            # Dependencies
-```
-
-## 🎯 Key Features Implementation
-
-### State Management
-- **Cart**: Persistent cart using Zustand with localStorage
-- **Wishlist**: Persistent wishlist with localStorage
-- **Real-time updates**: Automatic UI updates on state changes
-
-### Responsive Design
-- Mobile-first approach
-- Breakpoints: sm (640px), md (768px), lg (1024px), xl (1280px)
-- Touch-friendly interactions
-- Optimized images for different screen sizes
-
-### Performance
-- Next.js App Router for optimal performance
-- Image optimization with Next.js Image component
-- Code splitting and lazy loading
-- Optimized animations with Framer Motion
-
-## 🚚 Delivery Information
-
-- **Coverage**: Livraison partout en Tunisie
-- **Delivery Time**: 24h-48h after order confirmation
-- **Shipping**: Free shipping on orders over 200 TND
-- **Payment**: Cash on Delivery (COD)
-
-## 🛠️ Admin Dashboard (To Be Implemented)
-
-The admin dashboard will include:
-- Product management (add, edit, delete)
-- Order management and tracking
-- Customer management
-- Inventory/stock management
-- Analytics and reports
-- Settings and configuration
-
-## 📱 Social Media Integration
-
-- Instagram feed integration
-- Facebook page link
-- TikTok profile link
-- Social sharing capabilities
-
-## 🔐 Security Features
-
-- Secure checkout process
-- Data validation
-- Protected routes
-- HTTPS enforcement (production)
-
-## 🌐 Browser Support
-
-- Chrome (latest)
-- Firefox (latest)
-- Safari (latest)
-- Edge (latest)
-- Mobile browsers
-
-## 📈 Future Enhancements
-
-- [ ] User authentication and registration
-- [ ] Admin dashboard
-- [ ] Payment gateway integration
-- [ ] Email notifications
-- [ ] SMS notifications for order updates
-- [ ] Product reviews and ratings system
-- [ ] Advanced search with filters
-- [ ] Multi-language support (French/Arabic)
-- [ ] Live chat support
-- [ ] Loyalty program
-- [ ] Gift cards
-- [ ] Size guide
-- [ ] Virtual try-on (AR)
-
-## 🤝 Contributing
-
-Contributions are welcome! Please feel free to submit a Pull Request.
-
-## 📄 License
-
-This project is licensed under the MIT License.
-
-## 📞 Contact
-
-For any inquiries, please contact:
-- **Email**: contact@shein.tn
-- **Phone**: +216 XX XXX XXX
-- **Instagram**: @shein.tunisia
 
 ---
 
-Made with 💖 in Tunisia by the She in Team
+## 📁 Structure du Projet
+
+```
+shein-tunisia/
+├── app/                      # Pages Next.js
+│   ├── page.tsx             # Page d'accueil
+│   ├── shop/                # Boutique
+│   ├── contact/             # Contact
+│   ├── about/               # À propos
+│   ├── cart/                # Panier
+│   ├── checkout/            # Checkout
+│   ├── admin/               # Panel admin
+│   └── api/                 # API routes
+├── components/              # Composants React
+│   ├── layout/              # Header, Footer
+│   ├── home/                # Sections page d'accueil
+│   ├── products/            # ProductCard
+│   └── admin/               # Composants admin
+├── lib/                     # Utilitaires
+│   ├── db.ts               # Base de données
+│   ├── auth.ts             # Authentification
+│   └── security.ts         # Sécurité
+├── store/                   # Zustand stores
+│   ├── useCartStore.ts     # Panier
+│   └── useWishlistStore.ts # Wishlist
+└── public/                  # Fichiers statiques
+    └── logo.png            # Logo
+```
+
+---
+
+## 🎨 Fonctionnalités
+
+### **Pages Publiques**
+- 🏠 **Accueil** - Hero section, nouveautés, best-sellers
+- 🛍️ **Boutique** - Filtres avancés, tri, vue grille/liste
+- 👗 **Produit** - Détails, tailles, couleurs, avis
+- 🛒 **Panier** - Gestion des articles
+- ❤️ **Wishlist** - Liste de souhaits
+- 💳 **Checkout** - Formulaire de commande
+- 📧 **Contact** - Formulaire avec coordonnées
+- ℹ️ **À Propos** - Histoire et valeurs
+- ❓ **FAQ** - Questions fréquentes
+- 📦 **Suivi** - Suivi de commande
+
+### **Panel Admin**
+- 🔐 **Login** - Authentification sécurisée
+- 📊 **Dashboard** - Statistiques
+- 📦 **Produits** - CRUD complet
+- 🛒 **Commandes** - Gestion avec filtres
+- 💬 **Messages** - Gestion des contacts
+- ⚙️ **Paramètres** - Changement de mot de passe
+
+### **Filtres Boutique**
+- 🔍 Recherche par texte
+- 📂 Catégories (7 catégories)
+- 📏 Tailles (multi-sélection)
+- 🎨 Couleurs (aperçu visuel)
+- 💰 Prix (slider 0-500 TND)
+- ⚡ Filtres rapides (nouveautés, stock)
+- ⭐ Tri (vedette, prix, date, nom)
+
+### **Sécurité**
+- 🔒 Rate limiting
+- ✅ Validation des entrées
+- 🧹 Sanitization
+- 👥 RBAC (Role-Based Access Control)
+- 📝 Logging
+
+---
+
+## 🛠️ Technologies
+
+- **Framework:** Next.js 14
+- **Language:** TypeScript
+- **Styling:** Tailwind CSS
+- **Animations:** Framer Motion
+- **State:** Zustand
+- **Icons:** React Icons
+- **Deployment:** Vercel
+
+---
+
+## 📞 Coordonnées
+
+**Adresse:**  
+Rue Habib Thamer, Korba  
+En face Merry House Make Up  
+Nabeul, Tunisie
+
+**Téléphone:** +216 26 316 003  
+**Email:** contact@shein.tn
+
+**Réseaux Sociaux:**
+- Instagram
+- Facebook
+- TikTok
+
+---
+
+## 🚀 Déploiement
+
+### **Hébergement Gratuit sur Vercel**
+
+Suivez le guide détaillé dans `HEBERGEMENT_GRATUIT.md`
+
+**En résumé:**
+1. Créez un compte GitHub
+2. Poussez le code sur GitHub
+3. Créez un compte Vercel
+4. Importez le projet depuis GitHub
+5. Déployez (automatique)
+
+**Temps:** 15 minutes  
+**Coût:** 0 TND (100% gratuit)
+
+---
+
+## ⚠️ Important: Base de Données
+
+Le projet utilise actuellement un stockage **in-memory** (temporaire).
+
+**Pour la production, configurez MongoDB Atlas:**
+1. Créez un compte sur https://www.mongodb.com/cloud/atlas
+2. Créez un cluster gratuit (512 MB)
+3. Obtenez la connection string
+4. Ajoutez-la dans Vercel (Environment Variables)
+5. Modifiez `lib/db.ts` pour utiliser MongoDB
+
+**Guide complet:** Voir `HEBERGEMENT_GRATUIT.md`
+
+---
+
+## 🔐 Identifiants Admin
+
+**Email:** admin@shein.tn  
+**Mot de passe:** admin123
+
+⚠️ **Changez ce mot de passe en production !**
+
+---
+
+## 📚 Documentation
+
+### **Guides Disponibles:**
+- `HEBERGEMENT_GRATUIT.md` - Déploiement rapide (15 min)
+- `DEPLOYMENT_GUIDE.md` - Guide complet de déploiement
+- `DEPLOIEMENT_RAPIDE.md` - Guide visuel en 3 étapes
+- `CORRECTIONS_BUILD.md` - Corrections des erreurs
+- `SHOP_PAGE_IMPROVEMENTS.md` - Améliorations boutique
+- `CONTACT_PAGE_IMPROVEMENTS.md` - Améliorations contact
+- `SITE_EN_FRANCAIS.md` - Vérification français
+- `PRET_POUR_DEPLOIEMENT.md` - Checklist finale
+
+---
+
+## 🐛 Dépannage
+
+### **Erreur de Build**
+```bash
+# Nettoyer le cache
+Remove-Item -Recurse -Force .next
+
+# Rebuilder
+npm run build
+```
+
+### **Erreur de Dépendances**
+```bash
+# Réinstaller
+Remove-Item -Recurse -Force node_modules
+npm install
+```
+
+### **Port 3000 Occupé**
+```bash
+# Changer le port
+npm run dev -- -p 3001
+```
+
+---
+
+## 📊 Statistiques
+
+- **Pages:** 25+
+- **Composants:** 20+
+- **API Routes:** 15+
+- **Lignes de Code:** 10,000+
+- **Fonctionnalités:** 50+
+
+---
+
+## 🎯 Roadmap
+
+### **Version Actuelle (v1.0)**
+- ✅ Site complet et fonctionnel
+- ✅ Design moderne
+- ✅ Filtres avancés
+- ✅ Admin complet
+- ✅ Sécurité de base
+
+### **Prochaines Versions**
+- [ ] Intégration MongoDB
+- [ ] Paiement en ligne (Stripe, PayPal)
+- [ ] Notifications email
+- [ ] Multi-langue (arabe, anglais)
+- [ ] Programme de fidélité
+- [ ] Codes promo
+- [ ] Avis clients
+- [ ] Chat en direct
+
+---
+
+## 🤝 Contribution
+
+Ce projet est privé et développé pour She in.
+
+---
+
+## 📄 Licence
+
+Tous droits réservés © 2024 She in
+
+---
+
+## 💖 Fait avec
+
+- ❤️ Passion pour la mode
+- ☕ Beaucoup de café
+- 🎨 Design moderne
+- 🚀 Technologies de pointe
+
+---
+
+## 📞 Support
+
+Pour toute question ou assistance :
+- **Email:** contact@shein.tn
+- **Téléphone:** +216 26 316 003
+
+---
+
+**She in - La mode à portée de clic** 🛍️✨

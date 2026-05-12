@@ -192,7 +192,8 @@ export const smartCache = {
   },
 
   invalidatePattern: (pattern: string): void => {
-    for (const key of cache.keys()) {
+    const keys = Array.from(cache.keys())
+    for (const key of keys) {
       if (key.includes(pattern)) {
         cache.delete(key)
       }
