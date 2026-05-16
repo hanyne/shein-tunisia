@@ -181,6 +181,14 @@ export const db = {
       admins.push(newAdmin)
       return newAdmin
     },
+    updatePassword: (email: string, newPassword: string) => {
+      const admin = admins.find(a => a.email === email)
+      if (admin) {
+        admin.password = newPassword
+        return admin
+      }
+      return null
+    },
   },
   orders: {
     getAll: () => orders,
