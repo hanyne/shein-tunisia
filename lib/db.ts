@@ -1,41 +1,82 @@
-import connectDB from './mongodb'
-import { Product, Admin, Order, ContactMessage, IProduct, IAdmin, IOrder, IContactMessage } from './models'
+// Simple in-memory database (for development)
+// In production, replace with a real database like MongoDB, PostgreSQL, etc.
 
-// Helper function to convert MongoDB document to plain object
-const toPlainObject = (doc: any) => {
-  if (!doc) return null
-  const obj = doc.toObject ? doc.toObject() : doc
-  return {
-    ...obj,
-    id: obj._id.toString(),
-    _id: undefined,
-  }
+export interface Product {
+  id: string
+  name: string
+  price: number
+  description: string
+  images: string[]
+  category: string
+  sizes: string[]
+  colors: string[]
+  inStock: boolean
+  isNew?: boolean
+  isBestSeller?: boolean
+  rating?: number
+  reviews?: number
+  createdAt: string
+  updatedAt: string
 }
 
-// Initialize default admin if not exists
-async function initializeAdmin() {
-  await connectDB()
-  const adminExists = await Admin.findOne({ email: 'admin@shein.tn' })
-  
-  if (!adminExists) {
-    await Admin.create({
-      email: 'admin@shein.tn',
-      password: 'admin123', // In production, hash this!
-      name: 'Admin She in',
-      role: 'super_admin',
-    })
-    console.log('✅ Default admin created')
-  }
+export interface Admin {
+  id: string
+  email: string
+  password: string
+  name: string
+  role: 'admin' | 'super_admin'
+  createdAt: string
 }
 
-// Initialize default products if none exist
-async function initializeProducts() {
-  await connectDB()
-  const productCount = await Product.countDocuments()
-  
-  if (productCount === 0) {
-    await Product.insertMany([
+export interface OrderItem {
+  productId: string
+  productName: string
+  productImage: string
+  quantity: number
+  size?: string
+  color?: string
+  price: number
+}
+
+export interface Order {
+  id: string
+  orderNumber: string
+  customerFirstName: string
+  customerLastName: string
+  customerEmail: string
+  customerPhone: string
+  address: string
+  city: string
+  postalCode?: string
+  notes?: string
+  items: OrderItem[]
+  subtotal: number
+  shippingCost: number
+  total: number
+  status: 'pending' | 'confirmed' | 'preparing' | 'shipped' | 'delivered' | 'cancelled'
+  paymentMethod: string
+  createdAt: string
+  updatedAt: string
+}
+
+export interface ContactMessage {
+  id: string
+  name: string
+  email: string
+  subject: string
+  message: string
+  status: 'new' | 'read' | 'replied' | 'archived'
+  createdAt: string
+  updatedAt: string
+}
+
+// Global storage that persists across requests
+// In production, use a real database like MongoDB, PostgreSQL, etc.
+if (!(global as any).dbStorage) {
+  (global as any).dbStorage = {
+    products: [
       {
+        id: '1',
         name: 'Robe Fleurie Élégante',
         price: 89.99,
         description: 'Magnifique robe fleurie parfaite pour toutes les occasions.',
@@ -47,8 +88,11 @@ async function initializeProducts() {
         isNew: true,
         rating: 4.8,
         reviews: 124,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
       },
       {
+        id: '2',
         name: 'Sac à Main Luxe',
         price: 129.99,
         description: 'Sac à main élégant en cuir synthétique de haute qualité.',
@@ -58,277 +102,245 @@ async function initializeProducts() {
         colors: ['Noir', 'Beige', 'Rose'],
         inStock: true,
         isNew: true,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
       },
-    ])
-    console.log('✅ Default products created')
+    ],
+    admins: [
+      {
+        id: '1',
+        email: 'admin@shein.tn',
+        password: 'admin123', // In production, this should be hashed!
+        name: 'Admin She in',
+        role: 'super_admin',
+        createdAt: new Date().toISOString(),
+      },
+    ],
+    orders: [],
+    contactMessages: [],
   }
 }
 
-// Initialize database
-export async function initializeDatabase() {
-  try {
-    console.log('🔄 Starting database initialization...')
-    await initializeAdmin()
-    await initializeProducts()
-    console.log('✅ Database initialization completed')
-  } catch (error) {
-    console.error('❌ Database initialization error:', error)
-    throw error
-  }
+const storage = (global as any).dbStorage
+
+// Ensure contactMessages array exists
+if (!storage.contactMessages) {
+  storage.contactMessages = []
 }
 
-// Products CRUD
+let products: Product[] = storage.products
+let admins: Admin[] = storage.admins
+let orders: Order[] = storage.orders
+let contactMessages: ContactMessage[] = storage.contactMessages
+
+// Product CRUD operations
 export const db = {
   products: {
-    getAll: async () => {
-      await connectDB()
-      const products = await Product.find().sort({ createdAt: -1 })
-      return products.map(toPlainObject)
+    getAll: () => products,
+    getById: (id: string) => products.find(p => p.id === id),
+    create: (product: Omit<Product, 'id' | 'createdAt' | 'updatedAt'>) => {
+      const newProduct: Product = {
+        ...product,
+        id: Date.now().toString(),
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+      }
+      products.push(newProduct)
+      return newProduct
     },
-
-    getById: async (id: string) => {
-      await connectDB()
-      const product = await Product.findById(id)
-      return toPlainObject(product)
+    update: (id: string, updates: Partial<Product>) => {
+      const index = products.findIndex(p => p.id === id)
+      if (index !== -1) {
+        products[index] = {
+          ...products[index],
+          ...updates,
+          updatedAt: new Date().toISOString(),
+        }
+        return products[index]
+      }
+      return null
     },
-
-    create: async (productData: Partial<IProduct>) => {
-      await connectDB()
-      const product = await Product.create(productData)
-      return toPlainObject(product)
-    },
-
-    update: async (id: string, updates: Partial<IProduct>) => {
-      await connectDB()
-      const product = await Product.findByIdAndUpdate(id, updates, { new: true })
-      return toPlainObject(product)
-    },
-
-    delete: async (id: string) => {
-      await connectDB()
-      await Product.findByIdAndDelete(id)
-      return true
+    delete: (id: string) => {
+      const index = products.findIndex(p => p.id === id)
+      if (index !== -1) {
+        products.splice(index, 1)
+        return true
+      }
+      return false
     },
   },
-
   admins: {
-    getAll: async () => {
-      await connectDB()
-      const admins = await Admin.find()
-      return admins.map(toPlainObject)
-    },
-
-    getByEmail: async (email: string) => {
-      await connectDB()
-      const admin = await Admin.findOne({ email })
-      return toPlainObject(admin)
-    },
-
-    create: async (adminData: Partial<IAdmin>) => {
-      await connectDB()
-      const admin = await Admin.create(adminData)
-      return toPlainObject(admin)
-    },
-
-    updatePassword: async (email: string, newPassword: string) => {
-      await connectDB()
-      const admin = await Admin.findOneAndUpdate(
-        { email },
-        { password: newPassword },
-        { new: true }
-      )
-      return toPlainObject(admin)
+    getAll: () => admins,
+    getByEmail: (email: string) => admins.find(a => a.email === email),
+    create: (admin: Omit<Admin, 'id' | 'createdAt'>) => {
+      const newAdmin: Admin = {
+        ...admin,
+        id: Date.now().toString(),
+        createdAt: new Date().toISOString(),
+      }
+      admins.push(newAdmin)
+      return newAdmin
     },
   },
-
   orders: {
-    getAll: async () => {
-      await connectDB()
-      const orders = await Order.find().sort({ createdAt: -1 })
-      return orders.map(toPlainObject)
-    },
-
-    getById: async (id: string) => {
-      await connectDB()
-      const order = await Order.findById(id)
-      return toPlainObject(order)
-    },
-
-    getByOrderNumber: async (orderNumber: string) => {
-      await connectDB()
-      const order = await Order.findOne({ orderNumber })
-      return toPlainObject(order)
-    },
-
-    getByStatus: async (status: string) => {
-      await connectDB()
-      const orders = await Order.find({ status }).sort({ createdAt: -1 })
-      return orders.map(toPlainObject)
-    },
-
-    search: async (filters: {
+    getAll: () => orders,
+    getById: (id: string) => orders.find(o => o.id === id),
+    getByOrderNumber: (orderNumber: string) => orders.find(o => o.orderNumber === orderNumber),
+    getByStatus: (status: string) => orders.filter(o => o.status === status),
+    search: (filters: {
       status?: string
       searchTerm?: string
       startDate?: string
       endDate?: string
     }) => {
-      await connectDB()
-      const query: any = {}
-
-      if (filters.status && filters.status !== 'all') {
-        query.status = filters.status
-      }
-
-      if (filters.searchTerm) {
-        const term = filters.searchTerm
-        query.$or = [
-          { orderNumber: { $regex: term, $options: 'i' } },
-          { customerFirstName: { $regex: term, $options: 'i' } },
-          { customerLastName: { $regex: term, $options: 'i' } },
-          { customerEmail: { $regex: term, $options: 'i' } },
-          { customerPhone: { $regex: term, $options: 'i' } },
-        ]
-      }
-
-      if (filters.startDate) {
-        query.createdAt = { ...query.createdAt, $gte: new Date(filters.startDate) }
-      }
-
-      if (filters.endDate) {
-        query.createdAt = { ...query.createdAt, $lte: new Date(filters.endDate) }
-      }
-
-      const orders = await Order.find(query).sort({ createdAt: -1 })
-      return orders.map(toPlainObject)
-    },
-
-    create: async (orderData: Partial<IOrder>) => {
-      await connectDB()
-      const orderNumber = `SHE${Date.now().toString().slice(-8)}`
-      const order = await Order.create({
-        ...orderData,
-        orderNumber,
-      })
-      return toPlainObject(order)
-    },
-
-    update: async (id: string, updates: Partial<IOrder>) => {
-      await connectDB()
-      const order = await Order.findByIdAndUpdate(id, updates, { new: true })
-      return toPlainObject(order)
-    },
-
-    delete: async (id: string) => {
-      await connectDB()
-      await Order.findByIdAndDelete(id)
-      return true
-    },
-
-    getStats: async () => {
-      await connectDB()
-      const orders = await Order.find()
+      let filtered = [...orders]
       
+      if (filters.status && filters.status !== 'all') {
+        filtered = filtered.filter(o => o.status === filters.status)
+      }
+      
+      if (filters.searchTerm) {
+        const term = filters.searchTerm.toLowerCase()
+        filtered = filtered.filter(o => 
+          o.orderNumber.toLowerCase().includes(term) ||
+          o.customerFirstName.toLowerCase().includes(term) ||
+          o.customerLastName.toLowerCase().includes(term) ||
+          o.customerEmail.toLowerCase().includes(term) ||
+          o.customerPhone.includes(term)
+        )
+      }
+      
+      if (filters.startDate) {
+        filtered = filtered.filter(o => new Date(o.createdAt) >= new Date(filters.startDate!))
+      }
+      
+      if (filters.endDate) {
+        filtered = filtered.filter(o => new Date(o.createdAt) <= new Date(filters.endDate!))
+      }
+      
+      return filtered.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+    },
+    create: (order: Omit<Order, 'id' | 'orderNumber' | 'createdAt' | 'updatedAt'>) => {
+      const orderNumber = `SHE${Date.now().toString().slice(-8)}`
+      const newOrder: Order = {
+        ...order,
+        id: Date.now().toString(),
+        orderNumber,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+      }
+      orders.push(newOrder)
+      return newOrder
+    },
+    update: (id: string, updates: Partial<Order>) => {
+      const index = orders.findIndex(o => o.id === id)
+      if (index !== -1) {
+        orders[index] = {
+          ...orders[index],
+          ...updates,
+          updatedAt: new Date().toISOString(),
+        }
+        return orders[index]
+      }
+      return null
+    },
+    delete: (id: string) => {
+      const index = orders.findIndex(o => o.id === id)
+      if (index !== -1) {
+        orders.splice(index, 1)
+        return true
+      }
+      return false
+    },
+    getStats: () => {
       return {
         total: orders.length,
-        pending: orders.filter((o) => o.status === 'pending').length,
-        confirmed: orders.filter((o) => o.status === 'confirmed').length,
-        preparing: orders.filter((o) => o.status === 'preparing').length,
-        shipped: orders.filter((o) => o.status === 'shipped').length,
-        delivered: orders.filter((o) => o.status === 'delivered').length,
-        cancelled: orders.filter((o) => o.status === 'cancelled').length,
+        pending: orders.filter(o => o.status === 'pending').length,
+        confirmed: orders.filter(o => o.status === 'confirmed').length,
+        preparing: orders.filter(o => o.status === 'preparing').length,
+        shipped: orders.filter(o => o.status === 'shipped').length,
+        delivered: orders.filter(o => o.status === 'delivered').length,
+        cancelled: orders.filter(o => o.status === 'cancelled').length,
         totalRevenue: orders
-          .filter((o) => o.status !== 'cancelled')
+          .filter(o => o.status !== 'cancelled')
           .reduce((sum, o) => sum + o.total, 0),
       }
     },
   },
-
   contactMessages: {
-    getAll: async () => {
-      await connectDB()
-      const messages = await ContactMessage.find().sort({ createdAt: -1 })
-      return messages.map(toPlainObject)
-    },
-
-    getById: async (id: string) => {
-      await connectDB()
-      const message = await ContactMessage.findById(id)
-      return toPlainObject(message)
-    },
-
-    getByStatus: async (status: string) => {
-      await connectDB()
-      const messages = await ContactMessage.find({ status }).sort({ createdAt: -1 })
-      return messages.map(toPlainObject)
-    },
-
-    search: async (filters: {
+    getAll: () => contactMessages,
+    getById: (id: string) => contactMessages.find(m => m.id === id),
+    getByStatus: (status: string) => contactMessages.filter(m => m.status === status),
+    search: (filters: {
       status?: string
       searchTerm?: string
       startDate?: string
       endDate?: string
     }) => {
-      await connectDB()
-      const query: any = {}
-
-      if (filters.status && filters.status !== 'all') {
-        query.status = filters.status
-      }
-
-      if (filters.searchTerm) {
-        const term = filters.searchTerm
-        query.$or = [
-          { name: { $regex: term, $options: 'i' } },
-          { email: { $regex: term, $options: 'i' } },
-          { subject: { $regex: term, $options: 'i' } },
-          { message: { $regex: term, $options: 'i' } },
-        ]
-      }
-
-      if (filters.startDate) {
-        query.createdAt = { ...query.createdAt, $gte: new Date(filters.startDate) }
-      }
-
-      if (filters.endDate) {
-        query.createdAt = { ...query.createdAt, $lte: new Date(filters.endDate) }
-      }
-
-      const messages = await ContactMessage.find(query).sort({ createdAt: -1 })
-      return messages.map(toPlainObject)
-    },
-
-    create: async (messageData: Partial<IContactMessage>) => {
-      await connectDB()
-      const message = await ContactMessage.create(messageData)
-      return toPlainObject(message)
-    },
-
-    update: async (id: string, updates: Partial<IContactMessage>) => {
-      await connectDB()
-      const message = await ContactMessage.findByIdAndUpdate(id, updates, { new: true })
-      return toPlainObject(message)
-    },
-
-    delete: async (id: string) => {
-      await connectDB()
-      await ContactMessage.findByIdAndDelete(id)
-      return true
-    },
-
-    getStats: async () => {
-      await connectDB()
-      const messages = await ContactMessage.find()
+      let filtered = [...contactMessages]
       
+      if (filters.status && filters.status !== 'all') {
+        filtered = filtered.filter(m => m.status === filters.status)
+      }
+      
+      if (filters.searchTerm) {
+        const term = filters.searchTerm.toLowerCase()
+        filtered = filtered.filter(m => 
+          m.name.toLowerCase().includes(term) ||
+          m.email.toLowerCase().includes(term) ||
+          m.subject.toLowerCase().includes(term) ||
+          m.message.toLowerCase().includes(term)
+        )
+      }
+      
+      if (filters.startDate) {
+        filtered = filtered.filter(m => new Date(m.createdAt) >= new Date(filters.startDate!))
+      }
+      
+      if (filters.endDate) {
+        filtered = filtered.filter(m => new Date(m.createdAt) <= new Date(filters.endDate!))
+      }
+      
+      return filtered.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+    },
+    create: (message: Omit<ContactMessage, 'id' | 'createdAt' | 'updatedAt'>) => {
+      const newMessage: ContactMessage = {
+        ...message,
+        id: Date.now().toString(),
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+      }
+      contactMessages.push(newMessage)
+      return newMessage
+    },
+    update: (id: string, updates: Partial<ContactMessage>) => {
+      const index = contactMessages.findIndex(m => m.id === id)
+      if (index !== -1) {
+        contactMessages[index] = {
+          ...contactMessages[index],
+          ...updates,
+          updatedAt: new Date().toISOString(),
+        }
+        return contactMessages[index]
+      }
+      return null
+    },
+    delete: (id: string) => {
+      const index = contactMessages.findIndex(m => m.id === id)
+      if (index !== -1) {
+        contactMessages.splice(index, 1)
+        return true
+      }
+      return false
+    },
+    getStats: () => {
       return {
-        total: messages.length,
-        new: messages.filter((m) => m.status === 'new').length,
-        read: messages.filter((m) => m.status === 'read').length,
-        replied: messages.filter((m) => m.status === 'replied').length,
-        archived: messages.filter((m) => m.status === 'archived').length,
+        total: contactMessages.length,
+        new: contactMessages.filter(m => m.status === 'new').length,
+        read: contactMessages.filter(m => m.status === 'read').length,
+        replied: contactMessages.filter(m => m.status === 'replied').length,
+        archived: contactMessages.filter(m => m.status === 'archived').length,
       }
     },
   },
 }
-
-// Initialize on import
-initializeDatabase().catch(console.error)
