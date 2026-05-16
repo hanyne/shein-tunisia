@@ -22,7 +22,7 @@ export async function GET(request: NextRequest) {
   const startDate = searchParams.get('startDate') || undefined
   const endDate = searchParams.get('endDate') || undefined
 
-  const orders = db.orders.search({
+  const orders = await db.orders.search({
     status,
     searchTerm,
     startDate,
@@ -70,7 +70,7 @@ export async function POST(request: NextRequest) {
 
     console.log('✅ Validation passed, creating order...')
 
-    const order = db.orders.create({
+    const order = await db.orders.create({
       customerFirstName,
       customerLastName,
       customerEmail,
@@ -88,7 +88,8 @@ export async function POST(request: NextRequest) {
     })
 
     console.log('✅ Order created successfully:', order.orderNumber)
-    console.log('📊 Total orders in DB:', db.orders.getAll().length)
+    const allOrders = await db.orders.getAll()
+    console.log('📊 Total orders in DB:', allOrders.length)
 
     return NextResponse.json(order, { status: 201 })
   } catch (error) {

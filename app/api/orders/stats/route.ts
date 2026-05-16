@@ -14,7 +14,7 @@ export async function GET(request: NextRequest) {
   }
 
   console.log('✅ Stats API - Authorized')
-  const stats = db.orders.getStats()
+  const stats = await db.orders.getStats()
   console.log('📊 Stats:', stats)
   
   const response = NextResponse.json(stats)

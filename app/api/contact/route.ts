@@ -18,7 +18,7 @@ export async function GET(request: NextRequest) {
   const startDate = searchParams.get('startDate') || undefined
   const endDate = searchParams.get('endDate') || undefined
 
-  const messages = db.contactMessages.search({
+  const messages = await db.contactMessages.search({
     status,
     searchTerm,
     startDate,
@@ -94,7 +94,7 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    const contactMessage = db.contactMessages.create(sanitizedData)
+    const contactMessage = await db.contactMessages.create(sanitizedData)
 
     logger.info('New contact message received', {
       id: contactMessage.id,

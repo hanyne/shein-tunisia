@@ -7,7 +7,7 @@ export async function GET(
   request: NextRequest,
   { params }: { params: { id: string } }
 ) {
-  const product = db.products.getById(params.id)
+  const product = await db.products.getById(params.id)
   
   if (!product) {
     return NextResponse.json({ error: 'Produit non trouvé' }, { status: 404 })
@@ -29,7 +29,7 @@ export async function PUT(
 
   try {
     const updates = await request.json()
-    const updatedProduct = db.products.update(params.id, updates)
+    const updatedProduct = await db.products.update(params.id, updates)
 
     if (!updatedProduct) {
       return NextResponse.json({ error: 'Produit non trouvé' }, { status: 404 })
@@ -52,7 +52,7 @@ export async function DELETE(
     return NextResponse.json({ error: 'Non autorisé' }, { status: 401 })
   }
 
-  const success = db.products.delete(params.id)
+  const success = await db.products.delete(params.id)
 
   if (!success) {
     return NextResponse.json({ error: 'Produit non trouvé' }, { status: 404 })

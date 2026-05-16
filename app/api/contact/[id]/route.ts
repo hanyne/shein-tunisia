@@ -14,7 +14,7 @@ export async function GET(
     return NextResponse.json({ error: 'Non autorisé' }, { status: 401 })
   }
 
-  const message = db.contactMessages.getById(params.id)
+  const message = await db.contactMessages.getById(params.id)
   
   if (!message) {
     return NextResponse.json({ error: 'Message non trouvé' }, { status: 404 })
@@ -42,7 +42,7 @@ export async function PUT(
 
   try {
     const body = await request.json()
-    const message = db.contactMessages.update(params.id, body)
+    const message = await db.contactMessages.update(params.id, body)
     
     if (!message) {
       return NextResponse.json({ error: 'Message non trouvé' }, { status: 404 })
@@ -76,7 +76,7 @@ export async function DELETE(
     return NextResponse.json({ error: 'Accès refusé' }, { status: 403 })
   }
 
-  const success = db.contactMessages.delete(params.id)
+  const success = await db.contactMessages.delete(params.id)
   
   if (!success) {
     return NextResponse.json({ error: 'Message non trouvé' }, { status: 404 })

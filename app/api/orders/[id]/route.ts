@@ -7,7 +7,7 @@ export async function GET(
   request: NextRequest,
   { params }: { params: { id: string } }
 ) {
-  const order = db.orders.getById(params.id)
+  const order = await db.orders.getById(params.id)
   
   if (!order) {
     return NextResponse.json({ error: 'Order not found' }, { status: 404 })
@@ -29,7 +29,7 @@ export async function PUT(
 
   try {
     const body = await request.json()
-    const order = db.orders.update(params.id, body)
+    const order = await db.orders.update(params.id, body)
     
     if (!order) {
       return NextResponse.json({ error: 'Order not found' }, { status: 404 })
@@ -56,7 +56,7 @@ export async function DELETE(
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
-  const success = db.orders.delete(params.id)
+  const success = await db.orders.delete(params.id)
   
   if (!success) {
     return NextResponse.json({ error: 'Order not found' }, { status: 404 })

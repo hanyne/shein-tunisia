@@ -4,7 +4,7 @@ import { auth } from '@/lib/auth'
 
 // GET all products
 export async function GET() {
-  const products = db.products.getAll()
+  const products = await db.products.getAll()
   return NextResponse.json(products)
 }
 
@@ -18,7 +18,7 @@ export async function POST(request: NextRequest) {
 
   try {
     const productData = await request.json()
-    const newProduct = db.products.create(productData)
+    const newProduct = await db.products.create(productData)
     return NextResponse.json(newProduct, { status: 201 })
   } catch (error) {
     return NextResponse.json({ error: 'Erreur serveur' }, { status: 500 })
