@@ -67,10 +67,13 @@ async function initializeProducts() {
 // Initialize database
 export async function initializeDatabase() {
   try {
+    console.log('🔄 Starting database initialization...')
     await initializeAdmin()
     await initializeProducts()
+    console.log('✅ Database initialization completed')
   } catch (error) {
     console.error('❌ Database initialization error:', error)
+    throw error
   }
 }
 
